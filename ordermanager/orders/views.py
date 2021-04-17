@@ -69,4 +69,4 @@ class RouteView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         if self.request.user.is_staff:
             return reverse('orders:order_list')
-        return reverse('orders:services_list')
+        return reverse('orders:service_list')
