@@ -42,8 +42,9 @@ class ParameterInService(models.Model):
         Service, models.CASCADE, related_name='parameters_assigned',
         verbose_name='Услуга', help_text='Услуга, для которой задан параметр')
     parameter = models.ForeignKey(
-        Parameter, models.CASCADE, related_name='services_assigned',
-        verbose_name='Параметр', help_text='Параметр, который задан для услуги')
+        Parameter, models.CASCADE,
+        related_name='services_assigned', verbose_name='Параметр',
+        help_text='Параметр, который задан для услуги')
     type = models.CharField(
         max_length=len(max(TYPE_CHOICES, key=lambda x: len(x[0]))[0]),
         choices=TYPE_CHOICES, verbose_name='Тип', help_text='Тип поля формы')
