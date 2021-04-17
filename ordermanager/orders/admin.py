@@ -1,12 +1,12 @@
 from django.contrib import admin
 
 from .models import (
-    Order, ParameterInOrder, Service, ServiceParameter,
-    ServiceParameterInService,
+    Order, ParameterInOrder, Service, Parameter,
+    ParameterInService,
 )
 
 admin.site.register(Order)
 admin.site.register(ParameterInOrder)
 admin.site.register(Service)
-admin.site.register(ServiceParameter)
-admin.site.register(ServiceParameterInService)
+admin.site.register(Parameter)
+admin.site.register(ParameterInService)

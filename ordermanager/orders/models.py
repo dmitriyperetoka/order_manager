@@ -4,7 +4,7 @@ from django.db import models
 User = get_user_model()
 
 
-class ServiceParameter(models.Model):
+class Parameter(models.Model):
     title = models.CharField(
         max_length=200, unique=True, verbose_name='Наименование',
         help_text='Наименование параметра услуги')
@@ -32,7 +32,7 @@ class Service(models.Model):
         return self.title
 
 
-class ServiceParameterInService(models.Model):
+class ParameterInService(models.Model):
     TYPE_CHOICES = [
         ('checkbox', 'Чекбокс'),
         ('text', 'Текст'),
@@ -42,7 +42,7 @@ class ServiceParameterInService(models.Model):
         Service, models.CASCADE, related_name='parameters_assigned',
         verbose_name='Услуга', help_text='Услуга, для которой задан параметр')
     parameter = models.ForeignKey(
-        ServiceParameter, models.CASCADE, related_name='services_assigned',
+        Parameter, models.CASCADE, related_name='services_assigned',
         verbose_name='Параметр', help_text='Параметр, который задан для услуги')
     type = models.CharField(
         max_length=len(max(TYPE_CHOICES, key=lambda x: len(x[0]))[0]),
@@ -50,8 +50,8 @@ class ServiceParameterInService(models.Model):
 
     class Meta:
         ordering = ['type', 'parameter']
-        verbose_name = 'Параметр, заданный для услуги'
-        verbose_name_plural = 'Параметры, заданные для услуг'
+        verbose_name = 'Тип параметра для услуги'
+        verbose_name_plural = 'Типы параметров для услуг'
         constraints = [
             models.UniqueConstraint(
                 fields=['service', 'parameter'],
@@ -67,15 +67,22 @@ class ServiceParameterInService(models.Model):
 
 class Order(models.Model):
     author = models.ForeignKey(
-        User, models.CASCADE, related_name='orders', verbose_name='Автор',
-        help_text='Автор заказа')
+        User, models.SET_NULL, null=True, related_name='orders_issued',
+        verbose_name='Автор', help_text='Автор заказа',
+        limit_choices_to=models.Q(is_staff=False))
     service = models.ForeignKey(
         Service, models.CASCADE, related_name='orders', verbose_name='Услуга',
         help_text='Заказываемая услуга')
     time_created = models.DateTimeField(auto_now_add=True, db_index=True)
+    complete = models.BooleanField(
+        verbose_name='Выполнено', default=False, db_index=True)
+    performer = models.ForeignKey(
+        User, models.SET_NULL, null=True, related_name='orders_performed',
+        verbose_name='Исполнитель', help_text='Исполнитель заказа',
+        limit_choices_to=models.Q(is_staff=True))
 
     class Meta:
-        ordering = ['-time_created']
+        ordering = ['time_created']
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
 
@@ -89,7 +96,7 @@ class ParameterInOrder(models.Model):
         related_name='parameters_assigned', verbose_name='Заказ',
         help_text='Заказ, в котором задан параметр услуги')
     parameter = models.ForeignKey(
-        ServiceParameter, models.CASCADE,
+        Parameter, models.CASCADE,
         related_name='orders_assigned', verbose_name='Параметр',
         help_text='Параметр услуги, который задан в заказе')
     value = models.TextField(

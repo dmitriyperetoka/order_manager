@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}{{ order }}{% endblock %}
+{% block content %}
+  <h1>{{ order }}</h1>
+  {% for item in order.parameters_assigned.all %}
+    <p>{{ item.parameter }}: {{ item.value }}</p>
+  {% endfor %}
+  {% if order.complete is not True %}
+    <form method="post" action="complete">{% csrf_token %}
+      <button type="submit">Завершить заказ</button>
+    </form>
+  {% else %}
+    <h2>Завершено</h2>
+  {% endif %}
+  <p><a href="{% url 'orders:index' %}">Вернуться на главную страницу</a></p>
+{% endblock %}

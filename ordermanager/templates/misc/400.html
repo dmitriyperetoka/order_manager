@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}Некорректный запрос{% endblock %}
+{% block content %}
+  <h1>Некорректный запрос</h1>
+  <p><a href="{% url 'orders:index' %}">Вернуться на главную страницу</a></p>
+{% endblock %}

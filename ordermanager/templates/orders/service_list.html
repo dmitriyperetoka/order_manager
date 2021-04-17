@@ -4,5 +4,7 @@
   <h1>Список услуг</h1>
   {% for service in service_list %}
     <p><a href="{% url 'orders:order_create' service.id %}">{{ service }}</a></p>
+  {% empty %}
+    <p>Список услуг пуст.</p>
   {% endfor %}
 {% endblock %}
