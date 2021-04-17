@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}{{ service }}{% endblock %}
+{% block content %}
+  <h1>Заказать услугу:</h1>
+  <h1>{{ service }}</h1>
+  <form method="post" action="{% url 'orders:order_create' service.id %}">{% csrf_token %}
+    <input type="hidden" name="service" value="{{ service.id }}">
+    <input type="hidden" name="parameters_in_service" value="{{ parameters_in_service }}">
+    {% for item in parameters_in_service %}
+      <input type="hidden" name="parameter_title" value="{{ item.parameter.title }}">
+      <p>
+        <label for="{{ item.id }}">{{ item.parameter.title }}</label>
+        <input id="{{ item.id }}" name="parameter_value" type="{{ item.type }}"
+               {% if item.type != "checkbox" %}required{% else %} ini {% endif %}>
+      </p>
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+      <p style="color: red;">{{ error }}</p>
+    {% endfor %}
+    <button type="submit">Заказать услугу</button>
+  </form>
+  <p><a href="{% url 'orders:index' %}">Вернуться на главную страницу</a></p>
+{% endblock %}

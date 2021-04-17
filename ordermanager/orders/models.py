@@ -22,9 +22,6 @@ class Service(models.Model):
     title = models.CharField(
         max_length=200, unique=True, verbose_name='Наименование',
         help_text='Наименование услуги')
-    parameters = models.ManyToManyField(
-        ServiceParameter, through='ServiceParameterInService',
-        through_fields=['service', 'parameter'])
 
     class Meta:
         ordering = ['title']
@@ -39,23 +36,21 @@ class ServiceParameterInService(models.Model):
     TYPE_CHOICES = [
         ('checkbox', 'Чекбокс'),
         ('text', 'Текст'),
-        ('email', 'Электронная почта'),
         ('number', 'Целое число'),
-        ('date', 'Дата'),
-        ('datetime', 'Дата и время'),
-        ('time', 'Время'),
     ]
-    type = models.CharField(
-        max_length=len(max(TYPE_CHOICES, key=lambda x: len(x[0]))[0]),
-        choices=TYPE_CHOICES, verbose_name='Тип', help_text='Тип поля формы')
     service = models.ForeignKey(
         Service, models.CASCADE, related_name='parameters_assigned',
         verbose_name='Услуга', help_text='Услуга, для которой задан параметр')
     parameter = models.ForeignKey(
         ServiceParameter, models.CASCADE, related_name='services_assigned',
         verbose_name='Параметр', help_text='Параметр, который задан для услуги')
+    type = models.CharField(
+        max_length=len(max(TYPE_CHOICES, key=lambda x: len(x[0]))[0]),
+        choices=TYPE_CHOICES, verbose_name='Тип', help_text='Тип поля формы')
+    q = models.NullBooleanField
 
     class Meta:
+        ordering = ['type', 'parameter']
         verbose_name = 'Параметр, заданный для услуги'
         verbose_name_plural = 'Параметры, заданные для услуг'
         constraints = [
@@ -113,6 +108,4 @@ class ParameterInOrder(models.Model):
         ]
 
     def __str__(self):
-        return (
-            f'Параметр {self.parameter} услуги {self.order.service} '
-            f'в заказе {str(self.order)[6:]}')
+        return f'Параметр {self.parameter} в заказе {str(self.order)[6:]}'

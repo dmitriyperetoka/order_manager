@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}Список услуг{% endblock %}
+{% block content %}
+  <h1>Список услуг</h1>
+  {% for service in service_list %}
+    <p><a href="{% url 'orders:order_create' service.id %}">{{ service }}</a></p>
+  {% endfor %}
+{% endblock %}
