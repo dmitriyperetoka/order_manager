@@ -6,5 +6,9 @@
 </head>
 <body>
   {% block content %}{% endblock %}
+  {% if user.is_authenticated %}
+    <hr>
+    <h3><a href="{% url 'logout' %}">Выйти из системы</a></h3>
+  {% endif %}
 </body>
 </html>

@@ -22,9 +22,6 @@
       <input type="hidden" name="parameters_quantity" value="0">
       <p>Список параметров пуст.</p>
     {% endfor %}
-    {% for error in form.non_field_errors %}
-      <p style="color: red;">{{ error }}</p>
-    {% endfor %}
     {% for error in form.errors %}
       <p style="color: red;">{{ error }}</p>
     {% endfor %}
