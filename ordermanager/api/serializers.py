@@ -22,7 +22,8 @@ class OrderReadSerializer(serializers.ModelSerializer):
 
 
 class OrderWriteSerializer(serializers.ModelSerializer):
-    performer = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    performer = serializers.HiddenField(
+        default=serializers.CurrentUserDefault())
     complete = serializers.HiddenField(default=True)
 
     class Meta:
