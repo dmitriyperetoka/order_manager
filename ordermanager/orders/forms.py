@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 
@@ -12,39 +11,33 @@ class OrderForm(forms.ModelForm):
         fields = ['service']
 
     def __init__(self, data=None, **kwargs):
-        self.parameter_titles = None
-        self.parameter_values = None
+        self.parameters = None
 
         if data is not None:
-            self.parameter_titles = data.getlist('parameter_title')
-            self.parameter_values = data.getlist('parameter_value')
+            print('\n', data, '\n')
+            self.parameters_in_service = dict()
+            for q in range(int(data.get('parameters_quantity', 0))):
+                title = data[f'parameter_title_{q}']
+                value = data[f'parameter_value_{q}']
+                self.parameters_in_service[title] = value
+            print('\n', self.parameters_in_service, '\n')
+
         super().__init__(data=data, **kwargs)
-
-    def clean(self):
-        exception = ValidationError(
-            'Заполните все значения параметров услуги для заказа.')
-
-        if len(self.parameter_titles) != len(self.parameter_values):
-            raise exception
-
-        for value in self.parameter_values:
-            if not value:
-                raise exception
-
-        return super().clean()
 
     @transaction.atomic
     def save(self, commit=True):
         order = super().save(commit=False)
         order.save()
+        print('\n', order, '\n')
 
-        parameters = []
-        for title, value in zip(self.parameter_titles, self.parameter_values):
+        parameters_in_order = []
+        for title, value in self.parameters_in_service.items():
             parameter = get_object_or_404(ServiceParameter, title=title)
-            parameters.append(
+            parameters_in_order.append(
                 ParameterInOrder(
                     order=order, parameter=parameter, value=value))
-        ParameterInOrder.objects.bulk_create(parameters)
+        print(parameters_in_order)
+        ParameterInOrder.objects.bulk_create(parameters_in_order)
 
         self.save_m2m()
         return order

@@ -3,18 +3,29 @@
 {% block content %}
   <h1>Заказать услугу:</h1>
   <h1>{{ service }}</h1>
-  <form method="post" action="{% url 'orders:order_create' service.id %}">{% csrf_token %}
-    <input type="hidden" name="service" value="{{ service.id }}">
-    <input type="hidden" name="parameters_in_service" value="{{ parameters_in_service }}">
-    {% for item in parameters_in_service %}
-      <input type="hidden" name="parameter_title" value="{{ item.parameter.title }}">
+  <form method="post">{% csrf_token %}
+   <input type="hidden" name="service" value="{{ service.id }}">
+   {% for item in parameters_in_service %}
+      <input type="hidden" name="parameter_title_{{ forloop.counter0 }}" value="{{ item.parameter.title }}">
       <p>
-        <label for="{{ item.id }}">{{ item.parameter.title }}</label>
-        <input id="{{ item.id }}" name="parameter_value" type="{{ item.type }}"
-               {% if item.type != "checkbox" %}required{% else %} ini {% endif %}>
+        <label for="extra_field_{{ item.id }}">{{ item.parameter.title }}</label>
+        {% if item.type == 'checkbox' %}
+          <input name="parameter_value_{{ forloop.counter0 }}" type="hidden" value="Нет">
+        {% endif %}
+        <input id="extra_field_{{ item.id }}" name="parameter_value_{{ forloop.counter0 }}" type="{{ item.type }}"
+               {% if item.type == "checkbox" %}value="Да"{% else %}autocomplete="off" required{% endif %}>
       </p>
+      {% if forloop.last %}
+        <input type="hidden" name="parameters_quantity" value="{{ forloop.counter }}">
+      {% endif %}
+    {% empty %}
+      <input type="hidden" name="parameters_quantity" value="0">
+      <p>Список параметров пуст.</p>
     {% endfor %}
     {% for error in form.non_field_errors %}
+      <p style="color: red;">{{ error }}</p>
+    {% endfor %}
+    {% for error in form.errors %}
       <p style="color: red;">{{ error }}</p>
     {% endfor %}
     <button type="submit">Заказать услугу</button>

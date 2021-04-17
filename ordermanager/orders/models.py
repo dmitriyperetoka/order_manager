@@ -47,7 +47,6 @@ class ServiceParameterInService(models.Model):
     type = models.CharField(
         max_length=len(max(TYPE_CHOICES, key=lambda x: len(x[0]))[0]),
         choices=TYPE_CHOICES, verbose_name='Тип', help_text='Тип поля формы')
-    q = models.NullBooleanField
 
     class Meta:
         ordering = ['type', 'parameter']
