@@ -48,7 +48,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/ordermanager:latest
+          tags: dmitriyperetoka/ordermanager:latest
  
   deploy:
     runs-on: ubuntu-latest
@@ -91,7 +91,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose -y
           sudo docker-compose down
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/ordermanager:latest
+          sudo docker pull dmitriyperetoka/ordermanager:latest
           sudo docker-compose up -d
           sudo docker-compose exec -T web python manage.py collectstatic --no-input
           sudo docker-compose exec -T web python manage.py migrate
