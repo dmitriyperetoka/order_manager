@@ -21,3 +21,9 @@ class OrderListRetrieveUpdateViewSet(
         if self.action in ['list', 'retrieve']:
             return OrderReadSerializer
         return OrderWriteSerializer
+
+    def get_queryset(self):
+        if self.action == 'list':
+            return Order.objects.filter(
+                complete=False).select_related('service')
+        return Order.objects.select_related('service')
