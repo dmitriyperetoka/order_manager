@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 
-from ordermanager.tests.base_classes import BaseSetUp, ViewsTestBase
+from .base_classes import BaseSetUp, ViewsTestBase
 from orders.models import Order, Service
 
 User = get_user_model()

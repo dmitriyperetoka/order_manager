@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 
-from ordermanager.tests.base_classes import BaseSetUp, UrlsTestBase
+from .base_classes import BaseSetUp, UrlsTestBase
 
 User = get_user_model()
 
