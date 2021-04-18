@@ -1,12 +1,7 @@
-import os
-import tempfile
-
-from PIL import Image
-
-from recipes.models import Recipe, Tag
-from users.models import Favorite, Purchase, Subscription
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+
+from orders.models import Order, Service
 
 User = get_user_model()
 
@@ -107,12 +102,11 @@ class ViewsTestBase(TestCase):
                 self.assertEqual(response.context['object'], obj)
 
     def check_object_list_in_context(self, pages):
-        for path, queryset, indexes in pages:
+        for path, queryset in pages:
             response = self.client.get(path)
             with self.subTest():
                 self.assertQuerysetEqual(
-                    response.context['object_list'],
-                    map(repr, queryset[indexes[0]:indexes[1]]))
+                    response.context['object_list'], map(repr, queryset))
 
     def check_extra_context_passed(self, pages):
         for path, extra_context in pages:
@@ -122,60 +116,10 @@ class ViewsTestBase(TestCase):
                     self.assertEqual(response.context[key], value)
 
 
-class RecipesViewsSetupBase(TestCase):
+class BaseSetUp(TestCase):
     def setUp(self):
-        self.user = User.objects.create(username='user')
-        self.client.force_login(self.user)
+        self.user = User.objects.create(username='someuser', is_staff=True)
         self.another_user = User.objects.create(username='anotheruser')
-        self.users = User.objects.all()
-
-        tags = [
-            Tag(title='Завтрак', slug='breakfast'),
-            Tag(title='Обед', slug='lunch'),
-            Tag(title='Ужин', slug='dinner'),
-        ]
-        Tag.objects.bulk_create(tags)
-        self.tags = Tag.objects.all()
-
-        self.fd, self.path = tempfile.mkstemp(suffix='.jpg')
-        Image.new("RGB", (1, 1), "#000").save(self.path)
-
-        self.recipe_kwargs = {
-            'author': self.user, 'image': self.path,
-            'title': 'Just some title', 'description': 'Just some description',
-            'cooking_time_minutes': 60}
-        self.recipe = Recipe.objects.create(**self.recipe_kwargs)
-
-        recipes = []
-        for q in range(29):
-            self.recipe_kwargs.update(
-                {'author': self.users[q % len(self.users)]})
-            recipes.append(Recipe(**self.recipe_kwargs))
-        Recipe.objects.bulk_create(recipes)
-
-        for index, recipe in enumerate(Recipe.objects.all()):
-            recipe.tags.set([self.tags[index % len(self.tags)]])
-
-    def tearDown(self):
-        os.close(self.fd)
-        os.remove(self.path)
-
-
-class UsersViewsSetupBase(RecipesViewsSetupBase):
-    def setUp(self):
-        super().setUp()
-        recipes = Recipe.objects.all()
-
-        favorites = []
-        for index, recipe in enumerate(recipes):
-            if not index % 2:
-                favorites.append(Favorite(user=self.user, recipe=recipe))
-        Favorite.objects.bulk_create(favorites)
-
-        purchases = []
-        for index, recipe in enumerate(recipes):
-            if not index % 3:
-                favorites.append(Purchase(user=self.user, recipe=recipe))
-        Favorite.objects.bulk_create(purchases)
-
-        Subscription.objects.create(user=self.user, author=self.another_user)
+        self.client.force_login(self.user)
+        self.service = Service.objects.create()
+        self.order = Order.objects.create(service=self.service)
