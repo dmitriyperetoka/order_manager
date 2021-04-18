@@ -68,14 +68,3 @@ class OrdersViewsTest(ViewsTestBase, BaseSetUp):
             (reverse('orders:service_list'), service_queryset),
         ]
         self.check_object_list_in_context(pages)
-
-    def test_extra_context_passed(self):
-        pages = [
-            (
-                reverse(
-                    'orders:order_create',
-                    kwargs={'service_id': self.service.id}),
-                {'service': self.service},
-            ),
-        ]
-        self.check_extra_context_passed(pages)

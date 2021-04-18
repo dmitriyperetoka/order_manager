@@ -108,13 +108,6 @@ class ViewsTestBase(TestCase):
                 self.assertQuerysetEqual(
                     response.context['object_list'], map(repr, queryset))
 
-    def check_extra_context_passed(self, pages):
-        for path, extra_context in pages:
-            response = self.client.get(path)
-            for key, value in extra_context.items():
-                with self.subTest():
-                    self.assertEqual(response.context[key], value)
-
 
 class BaseSetUp(TestCase):
     def setUp(self):
